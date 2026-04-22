@@ -4,12 +4,12 @@ import { useEffect, useState } from 'react';
 import { Landmark } from 'lucide-react';
 import { fetchRates, type RatesResponse } from '@/lib/api';
 
-const FLAG: Record<string, string> = {
-  USD: '🇺🇸',
-  EUR: '🇪🇺',
-  GBP: '🇬🇧',
-  PLN: '🇵🇱',
-  CHF: '🇨🇭',
+const CURRENCY_INFO: Record<string, { symbol: string; color: string; bg: string }> = {
+  USD: { symbol: '$', color: 'text-green-700', bg: 'bg-green-100' },
+  EUR: { symbol: '\u20AC', color: 'text-blue-700', bg: 'bg-blue-100' },
+  GBP: { symbol: '\u00A3', color: 'text-purple-700', bg: 'bg-purple-100' },
+  PLN: { symbol: 'z\u0142', color: 'text-red-700', bg: 'bg-red-100' },
+  CHF: { symbol: 'Fr', color: 'text-orange-700', bg: 'bg-orange-100' },
 };
 
 export function RatesCard() {
@@ -51,20 +51,28 @@ export function RatesCard() {
         </div>
       ) : data ? (
         <div className="space-y-1">
-          {data.rates.map((rate) => (
-            <div
-              key={rate.cc}
-              className="flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-surface-bg transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <span className="text-base">{FLAG[rate.cc] || ''}</span>
-                <span className="font-mono text-xs font-semibold text-txt-primary">{rate.cc}</span>
+          {data.rates.map((rate) => {
+            const info = CURRENCY_INFO[rate.cc] || { symbol: rate.cc, color: 'text-gray-700', bg: 'bg-gray-100' };
+            return (
+              <div
+                key={rate.cc}
+                className="flex items-center justify-between px-2.5 py-2 rounded-lg hover:bg-surface-bg transition-colors"
+              >
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-7 h-7 rounded-full ${info.bg} flex items-center justify-center`}>
+                    <span className={`text-xs font-bold ${info.color}`}>{info.symbol}</span>
+                  </div>
+                  <div>
+                    <span className="font-mono text-xs font-semibold text-txt-primary">{rate.cc}</span>
+                    <div className="text-[10px] text-txt-muted leading-tight">{rate.txt}</div>
+                  </div>
+                </div>
+                <span className="font-mono text-sm font-bold text-ugb-navy tabular-nums">
+                  {rate.rate.toFixed(4)}
+                </span>
               </div>
-              <span className="font-mono text-sm font-bold text-ugb-navy tabular-nums">
-                {rate.rate.toFixed(4)}
-              </span>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div className="text-center py-4 border border-dashed border-surface-border rounded-lg">
